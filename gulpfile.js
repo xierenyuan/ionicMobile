@@ -16,13 +16,51 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 //重命名
 var rename = require('gulp-rename');
-//图片压缩
-var imagemin = require('gulp-imagemin');
 //压缩css
 var minifyCss = require('gulp-minify-css');
 //删除文件
 var del = require("del");
 //requirejs
 var rjs = require('gulp-requirejs');
-//编译 sass
-var sass = require('gulp-sass');
+//监测
+gulp.task('watch', function () {
+    gulp.watch(paths.sass, ['sass']);
+});
+
+var paths = {
+    core: [
+        'app/lib/jquery/jquery-2.1.1.min.js',
+        'app/lib/ionic/ionic.bundle.min.js',
+        'app/lib/angular-ui/angular-local-storage.min.js',
+        'app/lib/mobiscroll/ionicMobile.mob.all.min.js'
+    ],
+    css: [
+        'assets/css/ionic/ionic.min.css',
+        'assets/css/mobiscroll/ionicMobile.mob.all.min.css'
+    ]
+};
+
+//合并压缩Javascript
+gulp.task('js', function () {
+    gulp.src(paths.core)
+        .pipe(concat('ionic.mobile.all.js'))
+        .pipe(gulp.dest('dist/'))
+        .pipe(jshint())
+        .pipe(uglify({
+            ASCLLOnly: true
+        }))
+        .pipe(rename({extname: '.min.js'}))
+        .pipe(gulp.dest('dist/'));
+
+});
+
+gulp.task('css', function () {
+    gulp.src(paths.css)
+        .pipe(concat('ionic.mobile.all.css'))
+        .pipe(gulp.dest('assets/themes'))
+        .pipe(minifyCss({
+            keepSpecialComments: 0
+        }))
+        .pipe(rename({extname: '.min.css'}))
+        .pipe(gulp.dest('assets/themes'));
+});
